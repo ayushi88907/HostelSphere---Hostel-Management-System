@@ -1,0 +1,35 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "A hostel mangement system.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ayushi88907/HostelSphere---Hostel-Management-System.git"
+  },
+  "keywords": [
+    "hostelManagement",
+    "SBPGM",
+    "academic-project"
+  ],
+  "author": "Mohit Jangid, Ayushi tiwari",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ayushi88907/HostelSphere---Hostel-Management-System/issues"
+  },
+  "homepage": "https://github.com/ayushi88907/HostelSphere---Hostel-Management-System#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^8.10.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
