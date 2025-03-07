@@ -1,0 +1,146 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String      @id @default(uuid())
+  firstName        String
+  lastName         String
+  email            String
+  password         String
+  studentId        String
+  courseName       String
+  otherCourseName  String?
+  registrationDate DateTime    @default(now())
+  profile          Profile?
+  complaint        Complaint[]
+  fees             Fees[]
+  role             Role        @default(Student)
+}
+
+model Admin {
+  id              String   @id @default(uuid())
+  firstName       String
+  lastName        String
+  email           String
+  password        String
+  staffId         String
+  department      String
+  reasonForAccess String
+  role            Role     @default(Warden)
+  profile         Profile?
+  notice          Notice[]
+  hostel          Hostel[]
+}
+
+model Profile {
+  id             String  @id @default(uuid())
+  contact        Int?
+  profilePicture String?
+  //only students can have room no
+  roomNo         Int?
+  //Only student Can have hostel name
+  hostelName     String?
+  //hostel Care only warden gets hostel care
+  hostelCare     String?
+  department     String?
+  admin          Admin   @relation(fields: [adminId], references: [id])
+  adminId        String  @unique
+  user           User    @relation(fields: [userId], references: [id])
+  userId         String  @unique
+}
+
+model Complaint {
+  id            String    @id @default(uuid())
+  type          String
+  title         String
+  complaintDate DateTime  @default(now())
+  status        Status    @default(pending)
+  description   String    @db.VarChar(300)
+  resolveDate   DateTime?
+  image         String?
+  upvote        Int       @default(0)
+  user          User      @relation(fields: [userId], references: [id])
+  userId        String
+  reslovedBy    String?
+}
+
+model Notice {
+  id          String   @id @default(uuid())
+  title       String
+  description String   @db.VarChar(300)
+  noticeDate  DateTime @default(now())
+  adminId     String
+  admin       Admin    @relation(fields: [adminId], references: [id])
+}
+
+model Otp {
+  id        String   @id @default(cuid())
+  otp       String
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  email     String
+}
+
+model Hostel {
+  id            Int     @id @default(autoincrement())
+  hostelName    String
+  roomCount     Int
+  roomOccoupied Int     @default(0)
+  admin         Admin   @relation(fields: [adminId], references: [id])
+  adminId       String
+  managedBy     String?
+  room          Room[]
+}
+
+model Room {
+  id       String @id @default(uuid())
+  roomNo   Int
+  hostelId Int
+  hostel   Hostel @relation(fields: [hostelId], references: [id])
+}
+
+model Fees {
+  id            String   @id @default(uuid())
+  paymentId     String   @unique
+  paymentSlip   String
+  paymentAmount Int
+  paymentDate   DateTime @default(now())
+  user          User     @relation(fields: [userId], references: [id])
+  userId        String
+}
+
+model Outing {
+  id                String    @id @default(cuid())
+  studentId         String
+  outingDate        DateTime
+  returnDate        DateTime
+  outingPurpose     String    @db.VarChar(300)
+  approvalStatus    Status    @default(pending)
+  approverId        String?
+  checkOutTime      DateTime?
+  securitySignature String?
+}
+
+enum Status {
+  resolved
+  pending
+  reject
+}
+
+enum Role {
+  Warden
+  Admin
+  Student
+}
