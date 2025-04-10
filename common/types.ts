@@ -2,8 +2,8 @@ import { z } from "zod";
 export const passwordRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{5,20}$/;
 
-export const studentRegisterSchema = z
-  .object({
+export const studentRegisterSchema = z.object({
+    id: z.string().optional(),
     role: z.enum(["Student"]),
     firstName: z.string().min(1, { message: "First name is required" }),
     lastName: z.string().min(1, { message: "Last name is required" }),
@@ -32,6 +32,7 @@ export const studentRegisterSchema = z
   });
 
 export const AdminRegisterSchema = z.object({
+  id: z.string().optional(),
   role: z.enum(["Warden", "Admin"]),
   firstName: z.string({ message: "first name is required" }),
   lastName: z.string({ message: "First name is required" }),
@@ -69,20 +70,21 @@ export const loginValidation = z.object({
 
 
 export const profile = z.object({
-  contact: z.number().min(1000000000).max(9999999999),
-  roomNo: z.number().optional(),
+  id: z.string().optional(),
+  contact: z.string().regex(/^\d{10}$/, "Invalid phone number").optional(),
+  roomNo: z.string().optional(),
   hostelName: z.string().optional(),
   departement: z.string().optional(),
   profilePicture: z.string().optional(),
 });
 
 export const complaint = z.object({
-  type: z.string(),
-  title: z.string(),
-  status: z.string(),
+  type: z.enum(["low", "medium", "high"]).default("low"),
+  subject: z.string(),
+  status: z.enum(["pending", "resolved", "inProgress"]).default("pending"),
   description: z.string().max(300),
-  image: z.string().optional(),
-  user: z.string(),
+  images: z.array(z.any()).optional(),
+  // user: z.string(), // add from session
 });
 
 export const hostel = z.object({

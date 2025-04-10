@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import {
   ChevronLeft,
   IdCardIcon,
+  InfoIcon,
   LockIcon,
   MailIcon,
   UserIcon,
@@ -33,6 +34,7 @@ import { useRouter } from "next/navigation";
 import { studentRegisterSchema } from "@/common/types";
 import FormInput from "@/components/ui/FormInput";
 import axios from "axios";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 type SignUpFormData = Zod.infer<typeof studentRegisterSchema>;
 
@@ -332,6 +334,18 @@ export default function Register() {
                     </Link>
                   </label>
                 </div>
+
+                <Alert className="bg-amber-50 border-amber-200">
+                  <InfoIcon className="h-4 w-4 text-amber-500 dark:text-amber-900" />
+                  <AlertTitle className="text-amber-800">
+                    Account Verification Required
+                  </AlertTitle>
+                  <AlertDescription className="text-amber-700 text-sm">
+                    Student accounts require verification by system
+                    administrators. You'll receive an email notification once
+                    your account is approved.
+                  </AlertDescription>
+                </Alert>
 
                 <Button
                   className="w-full mt-6"

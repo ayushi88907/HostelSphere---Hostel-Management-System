@@ -43,6 +43,9 @@ export const nextOptions: NextAuthOptions = {
                 email: credentials?.email,
                 role: credentials?.role,
               },
+              include : {
+                profile: true
+              }
             });
           } else if (
             credentials?.role === "Admin" ||
@@ -53,6 +56,9 @@ export const nextOptions: NextAuthOptions = {
                 email: credentials?.email,
                 role: credentials?.role!,
               },
+              include : {
+                profile: true
+              }
             });
           }
 
@@ -72,7 +78,9 @@ export const nextOptions: NextAuthOptions = {
           const newUser = {
             id : user.id,
             email: user.email,
-            role: user.role
+            role: user.role,
+            profilePicture: user.profile?.profilePicture || null,
+            name: user.firstName + user.lastName
           }
           
           console.log(newUser)
@@ -100,6 +108,8 @@ export const nextOptions: NextAuthOptions = {
         token.id = user.id;
         token.email = user.email;
         token.role = user.role
+        token.profilePicture = user.profilePicture;
+        token.name = user.name
       }
       return token;
     },
@@ -109,6 +119,8 @@ export const nextOptions: NextAuthOptions = {
         session.user.id = token.id;
         session.user.email = token.email;
         session.user.role = token.role;
+        session.user.profilePicture = token.profilePicture;
+        session.user.name = token.name
       }
 
       return session;

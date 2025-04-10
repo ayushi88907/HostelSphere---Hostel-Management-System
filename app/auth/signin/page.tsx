@@ -74,9 +74,9 @@ export default function Login() {
     try {
       const result = await signIn("credentials", {
         redirect: false,
-        email: formData.email,
-        password: formData.password,
-        role: formData.role,
+        email: parseData.data.email,
+        password: parseData.data.password,
+        role: parseData.data.role,
       });
 
       if (result?.error) {
@@ -119,7 +119,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col relative overflow-hidden">
       <div className="flex-1 flex items-center justify-center p-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -188,6 +188,7 @@ export default function Login() {
                         error={errors.email}
                         icon={<MailIcon size={18} />}
                         required
+                        className=""
                       />
 
                       <div className="space-y-2">
@@ -222,7 +223,7 @@ export default function Login() {
                     </form>
                   </CardContent>
                   <CardFooter className="flex justify-center">
-                    {role === "Student" ? (
+                    {role === "Student" ? 
                       <p className="text-sm text-muted-foreground">
                         Don't have an account?{" "}
                         <Link
@@ -232,17 +233,7 @@ export default function Login() {
                           Sign up
                         </Link>
                       </p>
-                    ) : (
-                      <p className="text-sm text-muted-foreground">
-                        Need a {role} account?{" "}
-                        <Link
-                          href="/auth/admin-warden-register"
-                          className="text-primary hover:underline"
-                        >
-                          Request access
-                        </Link>
-                      </p>
-                    )}
+                     : <p className="py-2.5"></p>}
                   </CardFooter>
                 </Card>
               </TabsContent>

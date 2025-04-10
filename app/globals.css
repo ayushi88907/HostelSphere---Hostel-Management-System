@@ -340,3 +340,11 @@
 .read-the-docs {
   color: #888;
 }
+
+.scrollbar-hidden {
+  scrollbar-width: none; 
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none; 
+}
