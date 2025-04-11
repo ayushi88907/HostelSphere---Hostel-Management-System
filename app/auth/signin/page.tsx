@@ -18,6 +18,7 @@ import {
   ChevronLeft,
   EyeIcon,
   EyeOffIcon,
+  InfoIcon,
   LockIcon,
   MailIcon,
 } from "lucide-react";
@@ -27,6 +28,10 @@ import FormInput from "@/components/ui/FormInput";
 import { useRouter } from "next/navigation";
 import { loginValidation } from "@/common/types";
 import { signIn } from "next-auth/react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { RedirectStatusCode } from "next/dist/client/components/redirect-status-code";
+import { strict } from "assert";
+import { string } from "zod";
 
 type SigninFormData = Zod.infer<typeof loginValidation>;
 
@@ -44,6 +49,7 @@ export default function Login() {
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
 
   const router = useRouter();
 
@@ -58,7 +64,7 @@ export default function Login() {
     const parseData = loginValidation.safeParse(formData);
 
     if (!parseData.success) {
-      console.log(parseData)
+      console.log(parseData);
       toast.error(
         parseData.error.issues.slice(-1)[0].message || "Invalid Credentials",
         {
@@ -72,12 +78,14 @@ export default function Login() {
     }
 
     try {
-      const result = await signIn("credentials", {
+      let result = await signIn("credentials", {
         redirect: false,
         email: parseData.data.email,
         password: parseData.data.password,
         role: parseData.data.role,
       });
+
+      console.log(result);
 
       if (result?.error) {
         throw new Error(result?.error);
@@ -90,13 +98,38 @@ export default function Login() {
 
         router.push("/dashboard");
       }
-    } catch (error) {
-      const err = (error as Error).message || "something went wrong.";
-      toast.error(err, {
+    } catch (error:any) {
+      console.log(error);
+
+      let errMsg = "Something went wrong.";
+      let statusCode = 500;
+
+      
+
+
+      // const errMsg = (error as Error).message || "something went wrong.";
+      // const statusCode = error?.status || 500;
+    
+      try {
+        const parsed = JSON.parse(error.message); // try parsing error.message
+        errMsg = parsed.message || errMsg;
+        statusCode = parsed.statusCode || statusCode;
+       
+      } catch (e) {
+        // Not a JSON error message, fallback
+        errMsg = error.message || errMsg;
+       
+      }
+
+      toast.error(errMsg, {
         id: id,
       });
-
-      console.log(error);
+      
+  if (statusCode === 403) {
+    setIsVerified(true);
+  } else {
+    setIsVerified(false);
+  }
     } finally {
       setIsSubmitting(false);
     }
@@ -149,9 +182,7 @@ export default function Login() {
           <Tabs
             defaultValue="Student"
             onChange={handleChange}
-            onValueChange={(value) =>
-              handleChange({ name: "role", value })
-            }
+            onValueChange={(value) => handleChange({ name: "role", value })}
             className="w-full"
           >
             <TabsList className="grid grid-cols-3 mb-8">
@@ -223,17 +254,37 @@ export default function Login() {
                     </form>
                   </CardContent>
                   <CardFooter className="flex justify-center">
-                    {role === "Student" ? 
-                      <p className="text-sm text-muted-foreground">
-                        Don't have an account?{" "}
-                        <Link
-                          href="/auth/signup"
-                          className="text-primary hover:underline"
-                        >
-                          Sign up
-                        </Link>
-                      </p>
-                     : <p className="py-2.5"></p>}
+                    {role === "Student" ? (
+                      <>
+                        
+                        {isVerified ? (
+                          <Alert className="bg-amber-50 border-amber-200">
+                            <InfoIcon className="h-4 w-4 text-amber-500 dark:text-amber-900" />
+                            <AlertTitle className="text-amber-800">
+                              Account Verification Pending
+                            </AlertTitle>
+                            <AlertDescription className="text-amber-700 text-sm">
+                              Your account is pending approval by the system
+                              administrator. You'll receive an email
+                              notification once your student account has been
+                              verified.
+                            </AlertDescription>
+                          </Alert>
+                        )
+                        : <p className="text-sm text-muted-foreground">
+                          Don't have an account?{" "}
+                          <Link
+                            href="/auth/signup"
+                            className="text-primary hover:underline"
+                          >
+                            Sign up
+                          </Link>
+                        </p>
+                      }
+                      </>
+                    ) : (
+                      <p className="py-2.5"></p>
+                    )}
                   </CardFooter>
                 </Card>
               </TabsContent>

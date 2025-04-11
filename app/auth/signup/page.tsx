@@ -50,7 +50,7 @@ interface FormErrors {
 }
 
 export default function Register() {
-
+  
   const [formData, setFormData] = useState<SignUpFormData>({
     firstName: "",
     lastName: "",
@@ -59,8 +59,8 @@ export default function Register() {
     studentId: "",
     courseName: "",
     otherCourseName: "",
-    acceptTerms: false,
-    role:"Student"
+    role:"Student",
+    isVerified:"Pending"
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
@@ -97,7 +97,6 @@ export default function Register() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement> | any) => {
     const { name, value } = e.target ? e.target : e;
-    console.log(name, value);
 
     if (name === "courseName" && value !== "other") {
       setFormData((prev) => ({
@@ -134,6 +133,8 @@ export default function Register() {
     console.log(formData);
 
     try {
+      console.log(formData)
+
       // need to encrupt the data.
       localStorage.setItem("userData", JSON.stringify(formData)); 
       
@@ -320,14 +321,14 @@ export default function Register() {
                   >
                     I agree to the{" "}
                     <Link
-                      href="/terms"
+                      href="#"
                       className="text-primary hover:underline"
                     >
                       terms of service
                     </Link>{" "}
                     and{" "}
                     <Link
-                      href="/privacy"
+                      href="#"
                       className="text-primary hover:underline"
                     >
                       privacy policy

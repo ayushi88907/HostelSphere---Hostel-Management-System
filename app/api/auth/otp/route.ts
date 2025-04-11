@@ -1,4 +1,4 @@
-import { optSentEmailInfo } from "@/lib/emailTextFormate/otpSent";
+import { optSentEmailInfo } from "@/lib/emailTemplates/otpSent";
 import { CustomError } from "@/lib/Error";
 import { mailSender } from "@/lib/mailSender";
 import { prisma } from "@/lib/prisma";
@@ -8,14 +8,16 @@ import otpGenerator from 'otp-generator'
 export const POST = async(req:NextRequest)=>{
     const data = await req.json()
 
+    console.log(data) 
 
   try {
     // await ensureDatabaseConnection();
 
-    let User;
+    let User:any;
     if (!data.email) {
       throw new CustomError("Invalid Email", false, 403);
     }
+
     if (data.role === "Student") {
       User = await prisma.user.findFirst({
         where: {
@@ -23,9 +25,10 @@ export const POST = async(req:NextRequest)=>{
         },
       });
 
-      if (User && !User.isVerified) {
+      if (User && User.isVerified === "Pending") {
         throw new CustomError("Please wait for admin approval", false, 403);
       }
+
     } else {
       User = await prisma.admin.findFirst({
         where: {

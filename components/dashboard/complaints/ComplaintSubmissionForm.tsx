@@ -128,10 +128,10 @@ export default function ComplaintForm() {
         <CardContent>
           <form className="space-y-4" onSubmit={handleSubmit(submitComplaint)}>
             <div className="space-y-2">
-              <Label htmlFor="subject">Subject</Label>
+              <Label htmlFor="title">Subject</Label>
               <Input
-                id="subject"
-                {...register("subject")}
+                id="title"
+                {...register("title")}
                 placeholder="Enter the subject of your complaint"
               />
             </div>

@@ -57,7 +57,7 @@ export const accountRequestSent = (studentName: string) => {
     `;
 };
 
-export const accountRequestApproved = (studentName: string) => {
+export const accountRequestApproved = (studentName: string, email:string ) => {
   const year = new Date().getFullYear();
 
   return `<!DOCTYPE html>
@@ -117,8 +117,7 @@ export const accountRequestApproved = (studentName: string) => {
 `;
 };
 
-export const accountRequestReject = (studentName: string) => {
-  const year = new Date().getFullYear();
+export const accountRequestReject = (studentName: string, email: string) => {
 
   return `<!DOCTYPE html>
 <html>
@@ -162,14 +161,14 @@ export const accountRequestReject = (studentName: string) => {
       <div class="content">
         Hello <strong>${studentName}</strong>,<br /><br />
 
-        We regret to inform you that your account request has been rejected by the administrator.<br /><br />
+        We regret to inform you that your account request with that ${email} has been rejected by the administrator.<br /><br />
 
         This could be due to incorrect or incomplete information. Please contact your college admin for further clarification or to try again.<br /><br />
 
         Thank you for your understanding.
       </div>
       <div class="footer">
-        &copy; ${year} Your College Name
+        <p>Best regards,<br />Hostel Management System</p>
       </div>
     </div>
   </body>

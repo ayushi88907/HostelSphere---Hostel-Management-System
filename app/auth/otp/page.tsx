@@ -101,10 +101,14 @@ export default function OTPInput() {
     };
 
     try {
+      console.log("I am going to request...", data)
+
       const result = await axios.post("/api/auth/signup", data);
 
+      console.log(result)
+
       if (result.status == 200) {
-        toast.success("User register successfully", {
+        toast.success(result.data.message, {
           id: toastId,
         });
 

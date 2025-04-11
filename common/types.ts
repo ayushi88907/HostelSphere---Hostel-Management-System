@@ -11,6 +11,7 @@ export const studentRegisterSchema = z.object({
     studentId: z.string().min(1, { message: "Student ID is required" }),
     courseName: z.string().min(1, { message: "Course name is required" }),
     otherCourseName: z.string().optional(),
+    isVerified: z.enum(["Approved", "Pending","Rejected"]).default("Pending"),
     password: z
       .string()
       .min(5, { message: "Password length cannot be less than 5 characters" })
@@ -49,7 +50,7 @@ export const AdminRegisterSchema = z.object({
     }),
     reasonForAccess: z.string({
       message: "Please describe reason for access shortly",
-    }),
+    })
     // assignHostel : z.enum(["boys-hostel-a", "boys-hostel-b", "girls-hostel-b", "girls-hostel-b"]).optional()
 })
 // .superRefine((data, ctx) => {
@@ -80,7 +81,7 @@ export const profile = z.object({
 
 export const complaint = z.object({
   type: z.enum(["low", "medium", "high"]).default("low"),
-  subject: z.string(),
+  title: z.string(),
   status: z.enum(["pending", "resolved", "inProgress"]).default("pending"),
   description: z.string().max(300),
   images: z.array(z.any()).optional(),

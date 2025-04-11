@@ -9,7 +9,7 @@ import bcrypt from "bcrypt";
 import { prisma } from "@/lib/prisma";
 import { CustomError } from "@/lib/Error";
 import { mailSender } from "@/lib/mailSender";
-import { accountRequestSent } from "@/lib/emailTextFormate/accountApprovalRequest";
+import { accountRequestSent } from "@/lib/emailTemplates/accountApprovalRequest";
 
 // step 1 : check the user type -> Student | Admin | Warden
 // step 2 : validate the OTP to that user.
@@ -42,6 +42,8 @@ export const POST = async (req: NextRequest) => {
         { status: 400 }
       );
     }
+
+    console.log(parseData)
 
     const otpRecord = await prisma.otp.findFirst({
       where: {
@@ -84,23 +86,8 @@ export const POST = async (req: NextRequest) => {
         },
       });
     }
-
-    if (parseData.data.role === "Admin" || parseData.data.role === "Warden") {
-      createdUser = await prisma.admin.create({
-        data: {
-          ...parseData.data,
-          profile: {
-            create: { department: parseData.data.department },
-          },
-          notice: {
-            create: [],
-          },
-          hostel: {
-            create: [],
-          },
-        },
-      });
-    }
+    
+    console.log(createdUser)
 
     if (!createdUser?.id) {
       throw new CustomError("Failed to create User", false, 404);
@@ -124,6 +111,7 @@ export const POST = async (req: NextRequest) => {
       },
       { status: 200 }
     );
+    
   } catch (error) {
     if (error instanceof CustomError) {
       return NextResponse.json(

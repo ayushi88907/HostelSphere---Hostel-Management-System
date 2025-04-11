@@ -5,51 +5,39 @@ import { serverSession } from "@/lib/serverSession"
 import { NextRequest, NextResponse } from "next/server";
 
 
-type ComplaintData  = Zod.infer<typeof complaint >
+// Student raises a complaint
+export const POST = async (req: NextRequest) => {
+  try {
+    const { title, description, raisedById } = await req.json();
 
-export const POST  = async(req:NextRequest) => {
+    const complaint = await prisma.complaint.create({
+      data: {
+        title,
+        description,
+        raisedById,
+      },
+    });
 
-    const data:ComplaintData = await req.json();
+    return NextResponse.json({ success: true, data: complaint });
+  } catch (error) {
+    return NextResponse.json({ success: false, message: (error as Error).message }, { status: 500 });
+  }
+};
 
-    try {
-        const session = await serverSession();
-        if(!session) 
-            throw new CustomError("Unauthorised Access.", false, 401);
-        
-        if(session.role !== "Student") 
-            throw new CustomError("Only student can raise complaints.", false, 401);
+// Admin/Warden fetch all complaints
+export const GET = async () => {
+  try {
+    const complaints = await prisma.complaint.findMany({
+      include: {
+        raisedBy: true,
+        upvotes: true,
+        resolvedBy: true,
+      },
+      orderBy: { createdAt: "desc" },
+    });
 
-        const parsedData = complaint.safeParse(data);
-        
-        if (!parsedData.success) throw new CustomError("Some fields are missing.", false, 401);
-        
-        const newComplaint = await prisma.complaint.create({ 
-            data:{...data, userId: session.id}
-        })
-
-        if(!newComplaint || !newComplaint.id) 
-            throw new CustomError("Raise new Complaint faild.", false, 401);
-        
-        return NextResponse.json({
-            success:true,
-            data: newComplaint, 
-            message: "Complaint raise successfully."
-        }, {status: 200})
-        
-    } catch (error) {
-        if(error instanceof CustomError){
-            return NextResponse.json({
-                success:false,
-                data: null, 
-                message: error.error
-            }, {status: error.status})
-        }else{
-            return NextResponse.json({
-                success:false,
-                data: null, 
-                message: (error as Error).message
-            }, {status: 500})
-        }
-    }
-
-}
+    return NextResponse.json({ success: true, data: complaints });
+  } catch (error) {
+    return NextResponse.json({ success: false, message: (error as Error).message }, { status: 500 });
+  }
+};

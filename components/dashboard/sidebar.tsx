@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
+  Accessibility,
   BedDouble,
   CalendarCheck,
   FileText,
@@ -11,6 +12,7 @@ import {
   LogOutIcon,
   MessageSquare,
   Settings,
+  SquareChartGantt,
   User,
   Users,
   Wallet,
@@ -44,10 +46,26 @@ import { signOut } from "next-auth/react"
 
 export function DashboardSidebar() {
   const pathname = usePathname()
+  const clientSession = useClientSession();
 
-  const routes = [
+  const adminRoutes =[
+    // {
+    //   title: "Room Allocation",
+    //   icon: BedDouble,
+    //   href: "/dashboard/room-allocation",
+    //   variant: "default",
+    // },
     {
-      title: "Dashboard",
+      title: "Access management",
+      icon: SquareChartGantt,
+      href: "/dashboard/access-management",
+      variant: "default",
+    },
+  ];
+
+  let routes = [
+    {
+      title: "Home",
       icon: LayoutDashboard,
       href: "/dashboard",
       variant: "default",
@@ -56,12 +74,6 @@ export function DashboardSidebar() {
       title: "Profile",
       icon: User,
       href: "/dashboard/profile",
-      variant: "default",
-    },
-    {
-      title: "Room Allocation",
-      icon: BedDouble,
-      href: "/dashboard/room-allocation",
       variant: "default",
     },
     {
@@ -100,12 +112,14 @@ export function DashboardSidebar() {
       href: "/dashboard/settings",
       variant: "default",
     },
+    
   ];
+
+  routes = clientSession?.role !== "Student" ? [...routes, ...adminRoutes] : routes
 
   const { state } = useSidebar();
 
   const [session, setSession] = useState<any>(null);
-  const clientSession = useClientSession();
 
   const handleLogout = () => {
     signOut({

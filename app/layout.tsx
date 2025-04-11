@@ -21,7 +21,6 @@ export default function RootLayout({
           <NextAuthProvider>{children}</NextAuthProvider>
           <Toaster
             toastOptions={{
-              duration: 3000,
               className: "dark:bg-gray-800 dark:text-white bg-white text-black border border-gray-300 dark:border-gray-700 shadow-md",
             }}
           />

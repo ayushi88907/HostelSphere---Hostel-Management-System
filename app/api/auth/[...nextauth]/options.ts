@@ -34,7 +34,7 @@ export const nextOptions: NextAuthOptions = {
           return null;
         }
 
-        let user;
+        let user:any;
 
         try {
           if (credentials?.role === "Student") {
@@ -47,6 +47,11 @@ export const nextOptions: NextAuthOptions = {
                 profile: true
               }
             });
+
+            if(user && user.isVerified === "Pending"){
+              throw new Error(JSON.stringify({ message: "Please wait for Account approval.", statusCode: 403 }));
+          }
+
           } else if (
             credentials?.role === "Admin" ||
             credentials?.role === "Warden"
@@ -63,7 +68,7 @@ export const nextOptions: NextAuthOptions = {
           }
 
           if (!user || !user.id) {
-            throw new CustomError("User not found", false, 404);
+            throw new Error(JSON.stringify({ message: "User not found", statusCode: 404 }));
           }
 
           const validPassword = await bcrypt.compare(
@@ -72,7 +77,7 @@ export const nextOptions: NextAuthOptions = {
           );
 
           if (!validPassword) {
-            throw new Error("Invalid credentials");
+            throw new Error(JSON.stringify({ message: "Invalid credentials", statusCode: 401 }));
           }
 
           const newUser = {

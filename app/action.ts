@@ -7,7 +7,7 @@ import { AdminRegisterSchema, profile, studentRegisterSchema } from "@/common/ty
 import  otpGenerator  from 'otp-generator';
 import { mailSender } from "@/lib/mailSender";
 import { serverSession } from "../lib/serverSession";
-import { optSentEmailInfo } from "@/lib/emailTextFormate/otpSent";
+import { optSentEmailInfo } from "@/lib/emailTemplates/otpSent";
 
 export type AdminUser = Omit<Zod.infer<typeof AdminRegisterSchema>, "password"> & { profile:  Zod.infer<typeof profile>  } ;
 export type StudentUser = Omit<Zod.infer<typeof studentRegisterSchema>, "password"> & { profile:  Zod.infer<typeof profile>  };
