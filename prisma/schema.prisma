@@ -159,7 +159,7 @@ model Outing {
   createdAt         DateTime  @default(now())
   securitySignature String?
   user              User      @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  studentId         String    @unique()
+  studentId         String    
   Admin             Admin?     @relation(fields: [approverById], references: [id], onDelete: Cascade)
   approverById      String?
   approvedByParents Verified  @default(Pending)
