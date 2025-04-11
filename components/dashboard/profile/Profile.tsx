@@ -89,8 +89,6 @@ const Profile = ({ user, onUpdateProfile }: data) => {
 
       const result = await onUpdateProfile(updateData);
 
-      console.log(result);
-
       if (typeof result === "string") {
         toast.error(result, { id: toastId });
         reset();

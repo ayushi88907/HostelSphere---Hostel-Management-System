@@ -65,7 +65,7 @@ const ProfilePicture = ({
         formData );
 
         const { data } = response
-        console.log(data)
+
 
       if (data.secure_url) {
         setProfilePic(data.secure_url); 
@@ -75,7 +75,6 @@ const ProfilePicture = ({
         inputRef.current.value = ''
       }
       
-      console.log(data)
 
     } catch (error) {
 

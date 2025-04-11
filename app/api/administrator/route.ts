@@ -112,14 +112,15 @@ export const POST = async (req: NextRequest) => {
             create: [],
           },
           hostel: {
-            create: [],
+            create: parseData.data.hostel?.map((hostel) => ({
+              hostelName: hostel.hostelName, 
+              roomCount: 0,    
+            })),
           },
         },
       });
 
     }
-
-    console.log(createdUser);
 
     if (!createdUser?.id) {
       throw new CustomError(

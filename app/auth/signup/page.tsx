@@ -130,10 +130,8 @@ export default function Register() {
 
     setIsSubmitting(true);
 
-    console.log(formData);
 
     try {
-      console.log(formData)
 
       // need to encrupt the data.
       localStorage.setItem("userData", JSON.stringify(formData)); 

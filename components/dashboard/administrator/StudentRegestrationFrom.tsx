@@ -117,10 +117,8 @@ export default function StudentRegistrationFrom({ onClose, showModal, setRequest
 
     setIsSubmitting(true);
 
-    console.log(formData);
 
     try {
-      console.log(formData)
       
       const result = await axios.post("/api/administrator", {userData:formData});
       

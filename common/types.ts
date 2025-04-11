@@ -40,6 +40,9 @@ export const AdminRegisterSchema = z.object({
   email: z.string().email({ message: "email is not valid." }),
   staffId: z.string({ message: "Staff ID can't be empty" }),
   department: z.string({ message: "Department can't be empty" }),
+  hostel: z.array(z.object({
+    hostelName:z.array(z.string())
+  })).optional(),
   password: z
     .string()
     .min(5, { message: "password Length can not be less than 5 char" })

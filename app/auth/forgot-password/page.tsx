@@ -141,7 +141,7 @@ export default function ForgotPassword() {
   const onEmailSubmit = (values: EmailFormValues) => {
     setLoading(true);
     setEmail(values.email); // store to display on next compoent
-console.log(values.email)
+
     setTimeout(() => {
       setLoading(false);
       setStep("otp");
@@ -152,7 +152,7 @@ console.log(values.email)
   const onOTPSubmit = (values: OTPFormValues) => {
     setLoading(true);
 
-    console.log(values.otp)
+
     setTimeout(() => {
       setLoading(false);
       setStep("password");
@@ -163,8 +163,6 @@ console.log(values.email)
   const onPasswordSubmit = (values: PasswordFormValues) => {
     setLoading(true);
 
-    console.log(values.password)
-    console.log(values.confirmPassword)
 
     setTimeout(() => {
       setLoading(false);

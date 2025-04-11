@@ -31,8 +31,6 @@ const UpdatePassword = () => {
         return;
     }
     
-    console.log(passwordRegex.test(currentData.newPassword) )
-    
     if(!passwordRegex.test(currentData.newPassword) ){
         toast.error("Password isn't valid",{id:id});
         return;
@@ -40,7 +38,6 @@ const UpdatePassword = () => {
     try {
       
     const updatePass = await axios.put('/api/auth/updatePassword',{newPassword:currentData.newPassword})
-    console.log(updatePass)
 
     if(updatePass.data.success){
       toast.success(updatePass.data.message,{id:id})

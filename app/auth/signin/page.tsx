@@ -85,8 +85,6 @@ export default function Login() {
         role: parseData.data.role,
       });
 
-      console.log(result);
-
       if (result?.error) {
         throw new Error(result?.error);
       }

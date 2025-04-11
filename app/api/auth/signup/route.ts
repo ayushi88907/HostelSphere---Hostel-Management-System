@@ -86,8 +86,6 @@ export const POST = async (req: NextRequest) => {
         },
       });
     }
-    
-    console.log(createdUser)
 
     if (!createdUser?.id) {
       throw new CustomError("Failed to create User", false, 404);

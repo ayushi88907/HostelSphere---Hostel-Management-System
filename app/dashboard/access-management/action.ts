@@ -69,18 +69,17 @@ export const RejectRequest = async  (role:string, data:any)  => {
 
     let rejectedUser; 
 
-    if (session.role === "Admin" && role === "Warden") {
+    if (session.role === "Admin" && data.role === "Warden") {
+
       rejectedUser = await prisma.admin.update({
         where: { id: data.id },
         data: {
           isVerified: "Rejected",
-        },
-        include: {
-          profile: true,
-        },
+        }
       });
 
     } else {
+
       rejectedUser = await prisma.user.update({
         where: { id:data.id },
         data: {
@@ -90,6 +89,7 @@ export const RejectRequest = async  (role:string, data:any)  => {
           profile: true,
         },
       });
+
     }
 
     if (!rejectedUser?.id) {
@@ -134,7 +134,7 @@ export const ApprovedRequest = async  (role:string, data:any)  => {
 
     let approvedUser; 
 
-    if (session.role === "Admin" && role === "Warden") {
+    if (session.role === "Admin" && data.role === "Warden") {
       approvedUser = await prisma.admin.update({
         where: { id: data.id },
         data: {
@@ -194,12 +194,8 @@ export const ApprovedRequest = async  (role:string, data:any)  => {
   }
 }
 
-
 export const DeleteAccount = async (role:string, id:string) => {
     try {
-
-      console.log(role)
-      console.log(id)
   
       let  deletedUser;
 

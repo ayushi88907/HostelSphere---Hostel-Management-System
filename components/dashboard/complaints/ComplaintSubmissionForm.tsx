@@ -59,7 +59,6 @@ export default function ComplaintForm() {
 
     setSelectedImages(updatedImages);
     setValue("images", updatedImages);
-    console.log(updatedImages);
   };
 
   const handleRemoveImage = (index: number) => {
@@ -89,7 +88,6 @@ export default function ComplaintForm() {
       if(response.success) {
         showToast(response.message, "success");
         setShowComplaintForm(false);
-        console.log(response.data);
         
         // show data in the table ...
       }

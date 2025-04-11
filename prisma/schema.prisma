@@ -34,20 +34,21 @@ model User {
 }
 
 model Admin {
-  id              String      @id @default(uuid())
-  firstName       String
-  lastName        String
-  email           String
-  password        String
-  staffId         String
-  department      String
-  reasonForAccess String
-  role            Role        @default(Warden)
-  profile         Profile?
-  notice          Notice[]
-  hostel          Hostel[]
-  Complaint       Complaint[]
-  isVerified      WardenVerificationStatus?  @default(Approved)
+  id               String                    @id @default(uuid())
+  firstName        String
+  lastName         String
+  email            String
+  password         String
+  staffId          String
+  department       String
+  reasonForAccess  String
+  role             Role                      @default(Warden)
+  profile          Profile?
+  notice           Notice[]
+  hostel           Hostel[]
+  Complaint        Complaint[]
+  isVerified       WardenVerificationStatus? @default(Approved)
+  registrationDate DateTime                  @default(now())
 }
 
 enum WardenVerificationStatus {
@@ -68,7 +69,7 @@ model Profile {
   department     String?
   admin          Admin?  @relation(fields: [adminId], references: [id], onDelete: Cascade)
   adminId        String? @unique
-  user           User?   @relation(fields: [userId], references: [id] , onDelete: Cascade)
+  user           User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId         String? @unique
 }
 
@@ -81,10 +82,10 @@ model Complaint {
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
   images          String[]          @default([])
-  raisedBy        User              @relation(fields: [raisedById], references: [id] , onDelete: Cascade)
+  raisedBy        User              @relation(fields: [raisedById], references: [id], onDelete: Cascade)
   raisedById      String
   upvotes         ComplaintUpvote[]
-  resolvedBy      Admin?            @relation(fields: [resolvedById], references: [id] , onDelete: Cascade)
+  resolvedBy      Admin?            @relation(fields: [resolvedById], references: [id], onDelete: Cascade)
   resolvedById    String?
   resolvedMessage String?
 }
@@ -118,21 +119,22 @@ model Otp {
 }
 
 model Hostel {
-  id            Int     @id @default(autoincrement())
-  hostelName    String[]    @default([])
+  id            Int      @id @default(autoincrement())
+  hostelName    String[] @default([])
   roomCount     Int
-  roomOccoupied Int     @default(0)
-  admin         Admin   @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  roomOccoupied Int?     @default(0)
+  admin         Admin    @relation(fields: [adminId], references: [id], onDelete: Cascade)
   adminId       String
   managedBy     String?
-  room          Room[]
 }
+
+// room          Room[]?
 
 model Room {
   id       String @id @default(uuid())
   roomNo   Int
   hostelId Int
-  hostel   Hostel @relation(fields: [hostelId], references: [id])
+  // hostel   Hostel @relation(fields: [hostelId], references: [id])
 }
 
 model Fees {

@@ -21,6 +21,7 @@ import {
   ClockIcon,
   ShieldIcon,
   PlusIcon,
+  Trash,
 } from "lucide-react";
 import {
   Dialog,
@@ -111,6 +112,7 @@ export default function ApprovalManagement({
   const [roleFilter, setRoleFilter] = useState("Student");
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [selectedTab, setSelectedTab] = useState("Pending");
 
   const session = useClientSession();
 
@@ -148,7 +150,6 @@ export default function ApprovalManagement({
     let toastId = toast.loading("Deleting...");
     try {
       const data = requests.find((req: any) => req.id === id);
-      console.log(data);
 
       let result = await deleteAccount(data?.role, data.id);
 
@@ -191,7 +192,7 @@ export default function ApprovalManagement({
   useEffect(() => {
     if (!session) return;
     toast.dismiss();
-    console.log(roleFilter);
+
     (async () => {
       try {
         setLoading(true);
@@ -211,11 +212,16 @@ export default function ApprovalManagement({
         setLoading(false); // stop loading
       }
     })();
+
+    if (roleFilter === "Student") {
+      setSelectedTab("Pending");
+    } else {
+      setSelectedTab("Approved");
+    }
+
   }, [roleFilter, session]);
 
   if (!session) return <Loader />;
-
-  console.log(requests);
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -261,7 +267,7 @@ export default function ApprovalManagement({
         </div>
       </div>
       {roleFilter === "Student" ? (
-        <Tabs defaultValue="Pending" className="w-full">
+        <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
           <TabsList className="grid w-full grid-cols-3 mb-6">
             <TabsTrigger value="Pending">
               Pending ({pendingRequests.length})
@@ -611,7 +617,7 @@ export default function ApprovalManagement({
           ))}
         </Tabs>
       ) : (
-        <Tabs defaultValue="Approved" className="w-full">
+        <Tabs value={selectedTab} onValueChange={setSelectedTab} defaultValue="Approved" className="w-full">
           <TabsList className="grid grid-cols-2 mb-6 w-fit">
             <TabsTrigger value="Approved">
               Approved ({approvedRequests.length})
@@ -636,9 +642,7 @@ export default function ApprovalManagement({
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>
-                          {roleFilter === "Student" ? "Student" : "Staff"} ID
-                        </TableHead>
+                        <TableHead>Staff ID</TableHead>
                         <TableHead>Name</TableHead>
                         <TableHead>Role</TableHead>
                         <TableHead>Department</TableHead>
@@ -659,13 +663,13 @@ export default function ApprovalManagement({
                             </TableRow>
                           ))
                         : requests
-                            .filter((req: any) => req.status === status)
+                            .filter((req: any) => req.isVerified === status)
                             .map((request: any) => (
                               <TableRow key={request.id}>
                                 <TableCell className="font-medium">
                                   {request.staffId}
                                 </TableCell>
-                                <TableCell>{request.name}</TableCell>
+                                <TableCell>{request.firstName + request.lastName}</TableCell>
                                 <TableCell>
                                   <Badge
                                     variant="outline"
@@ -676,7 +680,7 @@ export default function ApprovalManagement({
                                 </TableCell>
                                 <TableCell>{request.department}</TableCell>
                                 <TableCell>
-                                  {formatDate(request.requestDate)}
+                                  {formatDate(request.registrationDate)}
                                 </TableCell>
                                 <TableCell className="text-right">
                                   <Dialog
@@ -707,7 +711,7 @@ export default function ApprovalManagement({
                                           Staff Account Request
                                         </DialogTitle>
                                         <DialogDescription>
-                                          Review details for {request.name}'s
+                                          Review details for {request.firstName}'s
                                           request
                                         </DialogDescription>
                                       </DialogHeader>
@@ -720,7 +724,7 @@ export default function ApprovalManagement({
                                             </div>
                                             <div>
                                               <h4 className="font-semibold">
-                                                {selectedRequest.name}
+                                                {selectedRequest.firstName + selectedRequest.lastName}
                                               </h4>
                                               <div className="flex items-center text-sm text-muted-foreground">
                                                 <MailIcon className="h-3 w-3 mr-1" />
@@ -760,7 +764,7 @@ export default function ApprovalManagement({
                                               </p>
                                               <p className="font-medium">
                                                 {formatDate(
-                                                  selectedRequest.requestDate
+                                                  selectedRequest.registrationDate
                                                 )}
                                               </p>
                                             </div>
@@ -770,27 +774,13 @@ export default function ApprovalManagement({
                                                   Assigned Hostel
                                                 </p>
                                                 <p className="font-medium">
-                                                  {selectedRequest.hostel}
+                                                  {selectedRequest.hostel.map( (hostel:any) => hostel.hostelName).join(", ") }
                                                 </p>
                                               </div>
                                             )}
                                           </div>
 
-                                          {status === "pending" && (
-                                            <div className="bg-amber-50 text-amber-800 p-3 rounded-md text-sm">
-                                              <div className="font-medium flex items-center">
-                                                <ShieldIcon className="h-4 w-4 mr-1 text-amber-500" />
-                                                Action Required
-                                              </div>
-                                              <p className="text-amber-700 mt-1">
-                                                Please review this request
-                                                carefully before approving or
-                                                rejecting.
-                                              </p>
-                                            </div>
-                                          )}
-
-                                          {status === "approved" && (
+                                          {status === "Approved" && (
                                             <div className="bg-green-50 text-green-800 p-3 rounded-md text-sm">
                                               <div className="font-medium flex items-center">
                                                 <CheckIcon className="h-4 w-4 mr-1 text-green-500" />
@@ -803,7 +793,7 @@ export default function ApprovalManagement({
                                             </div>
                                           )}
 
-                                          {status === "rejected" && (
+                                          {status === "Rejected" && (
                                             <div className="bg-red-50 text-red-800 p-3 rounded-md text-sm">
                                               <div className="font-medium flex items-center">
                                                 <XIcon className="h-4 w-4 mr-1 text-red-500" />
@@ -846,7 +836,7 @@ export default function ApprovalManagement({
                                         )}
 
                                         {status === "Rejected" && (
-                                          <>
+                                          <div className="flex gap-3 flex-wrap items-center justify-between">
                                             <Button
                                               onClick={() =>
                                                 selectedRequest &&
@@ -860,6 +850,17 @@ export default function ApprovalManagement({
                                               Approve & Create Account
                                             </Button>
 
+                                            <Button variant="destructive"
+                                              onClick={() =>
+                                                selectedRequest &&
+                                                handleDeleteAccount(
+                                                  selectedRequest.id)
+                                              }
+                                            >
+                                              <Trash className="h-4 w-4 mr-1" />
+                                              Delete Account
+                                            </Button>
+
                                             <Button
                                               variant="outline"
                                               onClick={() =>
@@ -868,7 +869,7 @@ export default function ApprovalManagement({
                                             >
                                               Close
                                             </Button>
-                                          </>
+                                          </div>
                                         )}
                                       </DialogFooter>
                                     </DialogContent>
@@ -905,13 +906,13 @@ export default function ApprovalManagement({
         />
       )}
 
-      {/* {roleFilter === "Warden" && showModal && (
+      {roleFilter === "Warden" && showModal && (
         <WardenRegistrationFrom
           setRequests={setRequests}
           showModal={showModal}
           onClose={() => setShowModal(false)}
         />
-      )} */}
+      )}
     </div>
   );
 }
