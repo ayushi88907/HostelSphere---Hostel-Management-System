@@ -3,8 +3,16 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import deleteAccount from "./action"
+import { serverSession } from "@/lib/serverSession"
+import DeleteAccountSetting from "./deleteAccount"
+import ThemeToggleBtn from "@/components/theme-toggle-btn"
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+
+  const session = await serverSession();
+  if(!session) return;
+
   return (
     <div className="space-y-6">
       <div>
@@ -33,14 +41,14 @@ export default function SettingsPage() {
               </div>
               <Switch id="push-notifications" defaultChecked />
             </div>
-            <Separator />
-            <div className="flex items-center justify-between">
+            {/* <Separator /> */}
+            {/* <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label htmlFor="sms-notifications">SMS Notifications</Label>
                 <p className="text-sm text-muted-foreground">Receive text messages for critical alerts.</p>
               </div>
               <Switch id="sms-notifications" />
-            </div>
+            </div> */}
           </CardContent>
         </Card>
         <Card>
@@ -54,7 +62,8 @@ export default function SettingsPage() {
                 <Label htmlFor="dark-mode">Dark Mode</Label>
                 <p className="text-sm text-muted-foreground">Toggle between light and dark mode.</p>
               </div>
-              <Switch id="dark-mode" />
+              {/* <Switch id="dark-mode" /> */}
+              <ThemeToggleBtn/>
             </div>
             <Separator />
             <div className="flex items-center justify-between">
@@ -66,34 +75,7 @@ export default function SettingsPage() {
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Privacy</CardTitle>
-            <CardDescription>Manage your privacy settings.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label htmlFor="activity-tracking">Activity Tracking</Label>
-                <p className="text-sm text-muted-foreground">
-                  Allow us to track your activity for a better experience.
-                </p>
-              </div>
-              <Switch id="activity-tracking" defaultChecked />
-            </div>
-            <Separator />
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label htmlFor="data-sharing">Data Sharing</Label>
-                <p className="text-sm text-muted-foreground">Share your usage data to help us improve our services.</p>
-              </div>
-              <Switch id="data-sharing" defaultChecked />
-            </div>
-            <div className="mt-6">
-              <Button variant="destructive">Delete Account</Button>
-            </div>
-          </CardContent>
-        </Card>
+        <DeleteAccountSetting/>
       </div>
     </div>
   )

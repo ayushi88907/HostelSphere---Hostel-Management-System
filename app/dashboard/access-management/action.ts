@@ -173,7 +173,7 @@ export const ApprovedRequest = async  (role:string, data:any)  => {
 
     return {
       success: true,
-      message: `${approvedUser.role} account has been rejected.`,
+      message: `${approvedUser.role} account has been approved.`,
       data: approvedUser,
     };
 

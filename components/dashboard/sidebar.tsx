@@ -64,36 +64,24 @@ export function DashboardSidebar() {
   ];
 
   let routes = [
-    {
-      title: "Home",
-      icon: LayoutDashboard,
-      href: "/dashboard",
-      variant: "default",
-    },
+    // {
+    //   title: "Home",
+    //   icon: LayoutDashboard,
+    //   href: "/dashboard",
+    //   variant: "default",
+    // },
     {
       title: "Profile",
       icon: User,
       href: "/dashboard/profile",
       variant: "default",
     },
-    {
-      title: "Fee Details",
-      icon: Wallet,
-      href: "/dashboard/fee-details",
-      variant: "default",
-    },
-    {
-      title: "Attendance",
-      icon: CalendarCheck,
-      href: "/dashboard/attendance",
-      variant: "default",
-    },
-    {
-      title: "Leave Form",
-      icon: FileText,
-      href: "/dashboard/leave-form",
-      variant: "default",
-    },
+    // {
+    //   title: "Attendance",
+    //   icon: CalendarCheck,
+    //   href: "/dashboard/attendance",
+    //   variant: "default",
+    // },
     {
       title: "Complaints",
       icon: MessageSquare,
@@ -152,7 +140,7 @@ export function DashboardSidebar() {
               }`}
             >
               {" "}
-              Hostel Management
+              Hostel Sphere
             </div>
           )}
         </div>

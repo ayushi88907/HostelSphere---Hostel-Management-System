@@ -25,11 +25,13 @@ import {
 } from "@/components/ui/select";
 import { showToast } from "@/components/ui/ShowOneToastOnly";
 import { raiseNewComplaint } from "@/app/dashboard/complaints/action";
+import toast from "react-hot-toast";
 
 
 type ComplaintData = Zod.infer<typeof complaint> & { images: File[] };
 
-export default function ComplaintForm() {
+export default function ComplaintForm({allComplaints}:any) {
+
   const [showComplaintForm, setShowComplaintForm] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -75,10 +77,16 @@ export default function ComplaintForm() {
       return;
     }
 
+    toast.dismiss();
+    const toastId = toast.loading("submiting complaint...")
+
     setIsSubmitting(true);
 
     try {
+      console.log(data);
+
       const response = await raiseNewComplaint(data)
+      console.log(response);
 
       if (!response.success) {
         showToast(response.message, "error");
@@ -88,12 +96,14 @@ export default function ComplaintForm() {
       if(response.success) {
         showToast(response.message, "success");
         setShowComplaintForm(false);
-        
+        console.log("refresh*****F", response.data)
+        allComplaints((prev:any) => [...prev, response.data] )
         // show data in the table ...
       }
 
     } catch (error) {
-      showToast("Something went wrong", "error");
+      //@ts-ignore
+      showToast((error.message || "Something went wrong"), "error");
       reset();
       console.log(error);
     }finally{
@@ -146,7 +156,7 @@ export default function ComplaintForm() {
 
             <div className="space-y-2">
               <Label htmlFor="priority">Priority</Label>
-              <Select
+              <Select 
                 defaultValue="low"
                 onValueChange={(value) => {
                   //@ts-ignore

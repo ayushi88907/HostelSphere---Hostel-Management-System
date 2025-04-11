@@ -49,6 +49,7 @@ model Admin {
   Complaint        Complaint[]
   isVerified       WardenVerificationStatus? @default(Approved)
   registrationDate DateTime                  @default(now())
+  Outing           Outing[]
 }
 
 enum WardenVerificationStatus {
@@ -149,15 +150,21 @@ model Fees {
 
 model Outing {
   id                String    @id @default(cuid())
-  studentId         String    @unique()
   outingDate        DateTime
   returnDate        DateTime
-  outingPurpose     String    @db.VarChar(300)
-  approvalStatus    Status    @default(pending)
-  approverId        String?
   checkOutTime      DateTime?
+  leavingTime       DateTime?
+  outingPurpose     String    @db.VarChar(300)
+  approvalStatus    Verified  @default(Pending)
+  createdAt         DateTime  @default(now())
   securitySignature String?
   user              User      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  studentId         String    @unique()
+  Admin             Admin?     @relation(fields: [approverById], references: [id], onDelete: Cascade)
+  approverById      String?
+  approvedByParents Verified  @default(Pending)
+  parentsEmail      String    
+  parentsContact    String    
 }
 
 model Attendance {

@@ -3,7 +3,6 @@ import toast from "react-hot-toast";
 export const showToast = (message: string, type: string) => {
     toast.dismiss()
     
-
     switch (type) {
         case "success":
           toast.success(message);

@@ -64,7 +64,7 @@ export const POST = async (req: NextRequest) => {
 
       if(isAlreadExist && isAlreadExist.id){
         throw new CustomError(
-          `Wardent with this email is already exists`,
+          `Warden with this email is already exists`,
           false,
           403
         );

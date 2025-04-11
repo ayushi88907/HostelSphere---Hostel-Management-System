@@ -3,6 +3,8 @@
 import { Loader } from "@/components/ui/Loader";
 import { ApprovedRequest, DeleteAccount, getDetails, RejectRequest } from "./action";
 import ApprovalManagement from "@/components/dashboard/administrator/ApprovalManagement";
+import { serverSession } from "@/lib/serverSession";
+import { redirect } from "next/navigation";
 
 // Mock data for staff approval requests
 const mockRequests = [
@@ -51,6 +53,17 @@ const mockRequests = [
 ];
 
 export default async function StaffApproval() {
+
+  const session = await serverSession();
+
+  if(!session) {
+    redirect("/")
+  };
+
+  if(session.role === "Student"){
+    redirect("/dashboard")
+  }
+
   return (
     <ApprovalManagement
       fetchData={getDetails}

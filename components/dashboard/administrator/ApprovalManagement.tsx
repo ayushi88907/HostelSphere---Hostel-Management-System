@@ -243,7 +243,7 @@ export default function ApprovalManagement({
             onClick={() => setShowModal(true)}
           >
             <PlusIcon />
-            Add New
+            Add New {roleFilter}
           </Button>
 
           <div className="">
@@ -255,7 +255,9 @@ export default function ApprovalManagement({
                 <SelectValue placeholder="Select role" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Warden">Warden</SelectItem>
+                {
+                  session.role === "Admin" &&  <SelectItem value="Warden">Warden</SelectItem>
+                }
                 <SelectItem value="Student">Student</SelectItem>
               </SelectContent>
             </Select>
@@ -335,7 +337,7 @@ export default function ApprovalManagement({
                                   {request.studentId}
                                 </TableCell>
                                 <TableCell>
-                                  {request.firstName + request.lastName}
+                                  {request.firstName + " " + request.lastName}
                                 </TableCell>
                                 <TableCell>
                                   <Badge
@@ -382,7 +384,7 @@ export default function ApprovalManagement({
                                         </DialogTitle>
                                         <DialogDescription>
                                           Review details for{" "}
-                                          {request.firstName + request.lastName}
+                                          {request.firstName +" "+ request.lastName}
                                           's request
                                         </DialogDescription>
                                       </DialogHeader>
@@ -395,7 +397,7 @@ export default function ApprovalManagement({
                                             </div>
                                             <div>
                                               <h4 className="font-semibold">
-                                                {selectedRequest.firstName +
+                                                {selectedRequest.firstName + " "+
                                                   selectedRequest.lastName}
                                               </h4>
                                               <div className="flex items-center text-sm text-muted-foreground">
@@ -669,7 +671,7 @@ export default function ApprovalManagement({
                                 <TableCell className="font-medium">
                                   {request.staffId}
                                 </TableCell>
-                                <TableCell>{request.firstName + request.lastName}</TableCell>
+                                <TableCell>{request.firstName + " "+request.lastName}</TableCell>
                                 <TableCell>
                                   <Badge
                                     variant="outline"
@@ -724,7 +726,7 @@ export default function ApprovalManagement({
                                             </div>
                                             <div>
                                               <h4 className="font-semibold">
-                                                {selectedRequest.firstName + selectedRequest.lastName}
+                                                {selectedRequest.firstName + " " +selectedRequest.lastName}
                                               </h4>
                                               <div className="flex items-center text-sm text-muted-foreground">
                                                 <MailIcon className="h-3 w-3 mr-1" />
