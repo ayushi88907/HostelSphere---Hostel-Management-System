@@ -163,6 +163,8 @@ model Outing {
   Admin             Admin?     @relation(fields: [approverById], references: [id], onDelete: Cascade)
   approverById      String?
   approvedByParents Verified  @default(Pending)
+  parentApprovalToken String? @unique
+  tokenExpiry         DateTime?
   parentsEmail      String    
   parentsContact    String    
 }

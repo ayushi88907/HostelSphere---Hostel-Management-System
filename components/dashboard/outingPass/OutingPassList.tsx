@@ -106,6 +106,7 @@ export default function OutingPassList({ gatePasses }: any) {
     }
   };
 
+  console.log(selectedGatepass)
 
   return (
     <>
@@ -279,10 +280,10 @@ export default function OutingPassList({ gatePasses }: any) {
                                     🗂️ Warden Approval:
                                   </p>
                                   <Badge variant={
-                                      selectedGatepass.approvedByParents ===
+                                      selectedGatepass.approvalStatus ===
                                       "Approved"
                                         ? "success"
-                                        : selectedGatepass.approvedByParents ===
+                                        : selectedGatepass.approvalStatus ===
                                           "Rejected"
                                         ? "destructive"
                                         : "default"
