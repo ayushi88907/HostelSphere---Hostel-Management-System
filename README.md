@@ -14,7 +14,8 @@ pnpm dev
 bun dev
 ```
 
-Leader: Ayushi Tiwari
+Leader: Ayushi Tiwari, 
+Team Member : Kanak, Khushi, Shana
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
