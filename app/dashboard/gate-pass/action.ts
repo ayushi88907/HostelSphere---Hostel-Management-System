@@ -61,10 +61,10 @@ export async function createOutingRequest(data: any) {
 
 export async function handleOutingStatus(
   outingId: string,
-  status: "Approved" | "Rejected"
+  status: "Approved" | "Rejected" | "Pending"
 ) {
   const session = await serverSession();
-  if (!session || session.role !== "Admin") {
+  if (!session || session.role !== "Warden") {
     throw new CustomError("Unauthorized", false, 401);
   }
 

@@ -174,7 +174,7 @@ const ComplaintsList = ({ complaintsDataList }: any) => {
       }
 
       if (result.success) {
-        setComplaints((prev:any) =>[...prev, result.data]);
+        setComplaints((prev:any) => prev.map((comp:any) => comp.id === id ? result.data : comp ));
         setDialogOpen(false);
 
         toast.success(result.message, { id: toastId });

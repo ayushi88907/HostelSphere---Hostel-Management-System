@@ -85,7 +85,7 @@ export const nextOptions: NextAuthOptions = {
             email: user.email,
             role: user.role,
             profilePicture: user.profile?.profilePicture || null,
-            name: user.firstName + user.lastName
+            name: user.firstName + " " + user.lastName
           }
           
           console.log(newUser)
