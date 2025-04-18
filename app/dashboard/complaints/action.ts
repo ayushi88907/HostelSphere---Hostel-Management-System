@@ -141,6 +141,49 @@ export const updateComplaint = async (id: string, status: any, resolvedMessage:a
   }
 };
 
+export const verifyComplaintStatus = async (id: string, status: any ) => {
+  try {
+    const session = await serverSession();
+    if (!session) throw new CustomError("Unauthorised Access.", false, 401);
+
+      const updated = await prisma.complaint.update({
+        where: { id: id },
+        data: {
+          isSuccessfullyResolved : status
+        },
+        include: {
+            raisedBy: true,
+            upvotes: true,
+            resolvedBy: true,
+          },
+      });
+
+    if (!updated || !updated.id)
+      throw new CustomError("faild to update complaint.", false, 401);
+
+    return {
+      success: true,
+      data: updated,
+      message: "Complaint update successfully.",
+    };
+
+  } catch (error) {
+    if (error instanceof CustomError) {
+      return {
+        success: false,
+        data: [],
+        message: error.error,
+      };
+    } else {
+      return {
+        success: false,
+        data: [],
+        message: (error as Error).message || "Something went wrong.",
+      };
+    }
+  }
+};
+
 export const deleteComplaint = async (id: string) => {
   try {
     const session = await serverSession();

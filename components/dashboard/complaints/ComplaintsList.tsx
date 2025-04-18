@@ -43,6 +43,7 @@ import {
   deleteComplaint,
   updateComplaint,
   upvoteComplaint,
+  verifyComplaintStatus,
 } from "@/app/dashboard/complaints/action";
 import {
   Select,
@@ -55,6 +56,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import ComplaintForm from "./ComplaintSubmissionForm";
 import { differenceInDays } from "date-fns";
+import { Input } from "@/components/ui/input";
 
 // Sample complaints data
 const complaintsDone = [
@@ -106,52 +108,65 @@ const ComplaintsList = ({ complaintsDataList }: any) => {
 
   console.log(complaints);
 
-    const currentStudentComplaints =
+  const currentStudentComplaints =
     complaints?.filter(
-        (complaint:any) => complaint.resolvedById === session.id
-      )|| [];
+      (complaint: any) => complaint.resolvedById === session.id
+    ) || [];
 
-      console.log("all my complaints:", currentStudentComplaints)
+  console.log("all my complaints:", currentStudentComplaints);
 
-      const openCount =
+  const openCount =
     session.role === "Student"
-      ? currentStudentComplaints.filter((c:any) => c.status === "PENDING").length
-      : complaints?.filter((c:any) => c.status === "PENDING").length || 0;
-  
+      ? currentStudentComplaints.filter((c: any) => c.status === "PENDING")
+          .length
+      : complaints?.filter((c: any) => c.status === "PENDING").length || 0;
+
   const inProgressCount =
     session.role === "Student"
-      ? currentStudentComplaints.filter((c:any) => c.status === "IN_PROGRESS").length
-      : complaints.filter((c:any) => c.status === "IN_PROGRESS").length || 0;
-  
+      ? currentStudentComplaints.filter((c: any) => c.status === "IN_PROGRESS")
+          .length
+      : complaints.filter((c: any) => c.status === "IN_PROGRESS").length || 0;
+
   const resolvedCount =
     session.role === "Student"
-      ? currentStudentComplaints.filter((c:any) => c.status === "RESOLVED").length
-      : complaints.filter((c:any) => c.status === "RESOLVED").length || 0;
-  
+      ? currentStudentComplaints.filter((c: any) => c.status === "RESOLVED")
+          .length
+      : complaints.filter((c: any) => c.status === "RESOLVED").length || 0;
+
   // Avg. resolution time (only for RESOLVED)
   let avgResolutionDays = 0;
   if (session.role === "Student") {
     const resolved = currentStudentComplaints.filter(
-      (c:any) => c.status === "RESOLVED" && c.updatedAt && c.createdAt
+      (c: any) => c.status === "RESOLVED" && c.updatedAt && c.createdAt
     );
-  
-    const totalDays = resolved.reduce((sum:any, c:any) => {
-      const days = differenceInDays(new Date(c.updatedAt), new Date(c.createdAt));
+
+    const totalDays = resolved.reduce((sum: any, c: any) => {
+      const days = differenceInDays(
+        new Date(c.updatedAt),
+        new Date(c.createdAt)
+      );
       return sum + days;
     }, 0);
-  
-    avgResolutionDays = resolved.length > 0 ? Math.round(totalDays / resolved.length) : 0;
-  }else{
+
+    avgResolutionDays =
+      resolved.length > 0 ? Math.round(totalDays / resolved.length) : 0;
+  } else {
     const resolved = complaints.filter(
-      (c:any) => c.status === "RESOLVED" && c.updatedAt && c.createdAt
+      (c: any) => c.status === "RESOLVED" && c.updatedAt && c.createdAt
     );
-  
-    const totalDays = resolved?.reduce((sum:any, c:any) => {
-      const days = differenceInDays(new Date(c.updatedAt), new Date(c.createdAt));
+
+    const totalDays = resolved?.reduce((sum: any, c: any) => {
+      const days = differenceInDays(
+        new Date(c.updatedAt),
+        new Date(c.createdAt)
+      );
       return sum + days;
     }, 0);
-  
-    avgResolutionDays = resolved && resolved.length > 0 ? Math.round(totalDays / resolved.length) : 0;
+
+    avgResolutionDays =
+      resolved && resolved.length > 0
+        ? Math.round(totalDays / resolved.length)
+        : 0;
   }
 
   const formatDate = (dateString: any) => {
@@ -167,14 +182,50 @@ const ComplaintsList = ({ complaintsDataList }: any) => {
     toast.dismiss();
     let toastId = toast.loading("Upvoting...");
     try {
-      let result = await updateComplaint(id, selectedComplaint.status, selectedComplaint.resolvedMessage);
+      let result = await updateComplaint(
+        id,
+        selectedComplaint.status,
+        selectedComplaint.resolvedMessage
+      );
 
       if (!result.success) {
         toast.error(result.message, { id: toastId });
       }
 
       if (result.success) {
-        setComplaints((prev:any) => prev.map((comp:any) => comp.id === id ? result.data : comp ));
+        setComplaints((prev: any) =>
+          prev.map((comp: any) => (comp.id === id ? result.data : comp))
+        );
+        setDialogOpen(false);
+
+        toast.success(result.message, { id: toastId });
+      }
+    } catch (error) {
+      console.log("Error fetching data:", error);
+      toast.error((error as Error).message, { id: toastId });
+    }
+  };
+
+  const changeVerifyStatus = async (id: string) => {
+    toast.dismiss();
+    let toastId = toast.loading("Updating status...");
+    try {
+
+      console.log(selectedComplaint)
+
+      let result = await verifyComplaintStatus(
+        id,
+        selectedComplaint.isSuccessfullyResolved
+      );
+
+      if (!result.success) {
+        toast.error(result.message, { id: toastId });
+      }
+
+      if (result.success) {
+        setComplaints((prev: any) =>
+          prev.map((comp: any) => (comp.id === id ? result.data : comp))
+        );
         setDialogOpen(false);
 
         toast.success(result.message, { id: toastId });
@@ -231,7 +282,7 @@ const ComplaintsList = ({ complaintsDataList }: any) => {
     }
   };
 
-  console.log(selectedComplaint)
+  console.log(selectedComplaint);
 
   // const handleUpdateStatus = async (id: string, status: string) => {
   //   toast.dismiss();
@@ -289,53 +340,45 @@ const ComplaintsList = ({ complaintsDataList }: any) => {
 
   return (
     <>
-     <div className="grid gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Complaint Statistics</CardTitle>
-              <CardDescription>
-                Overview of complaint status and resolution times.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                <div className="rounded-lg border p-3 bg-primary-foreground">
-                  <div className="text-sm font-medium text-muted-foreground">
-                    Open
-                  </div>
-                  <div className="text-2xl font-bold">
-                    {openCount}
-                  </div>
+      <div className="grid gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Complaint Statistics</CardTitle>
+            <CardDescription>
+              Overview of complaint status and resolution times.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <div className="rounded-lg border p-3 bg-primary-foreground">
+                <div className="text-sm font-medium text-muted-foreground">
+                  Open
                 </div>
-                <div className="rounded-lg border p-3 bg-primary-foreground">
-                  <div className="text-sm font-medium text-muted-foreground">
-                    In Progress
-                  </div>
-                  <div className="text-2xl font-bold">
-                    {inProgressCount}
-                  </div>
-                </div>
-                <div className="rounded-lg border p-3 bg-primary-foreground">
-                  <div className="text-sm font-medium text-muted-foreground">
-                    Closed
-                  </div>
-                  <div className="text-2xl font-bold">
-                    {resolvedCount}
-                  </div>
-                </div>
-
-                  <div className="rounded-lg border p-3 bg-primary-foreground">
-                    <div className="text-sm font-medium text-muted-foreground">
-                      Avg. Resolution
-                    </div>
-                    <div className="text-2xl font-bold">
-                      {avgResolutionDays}d
-                    </div>
-                  </div>
+                <div className="text-2xl font-bold">{openCount}</div>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+              <div className="rounded-lg border p-3 bg-primary-foreground">
+                <div className="text-sm font-medium text-muted-foreground">
+                  In Progress
+                </div>
+                <div className="text-2xl font-bold">{inProgressCount}</div>
+              </div>
+              <div className="rounded-lg border p-3 bg-primary-foreground">
+                <div className="text-sm font-medium text-muted-foreground">
+                  Closed
+                </div>
+                <div className="text-2xl font-bold">{resolvedCount}</div>
+              </div>
+
+              <div className="rounded-lg border p-3 bg-primary-foreground">
+                <div className="text-sm font-medium text-muted-foreground">
+                  Avg. Resolution
+                </div>
+                <div className="text-2xl font-bold">{avgResolutionDays}d</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       <Card>
         <CardHeader>
@@ -410,250 +453,274 @@ const ComplaintsList = ({ complaintsDataList }: any) => {
                           View
                         </Button>
                       </DialogTrigger>
-                      {
-                        selectedComplaint &&
-                     
-                      <DialogContent className="sm:max-w-md">
-                        <DialogHeader>
-                          <DialogTitle>Student Raised Complaint</DialogTitle>
-                          <DialogDescription>
-                            This complaint was raised by{" "}
-                            {complaint.raisedBy.firstName +
-                              " " +
-                              complaint.raisedBy.lastName}
-                            .
-                          </DialogDescription>
-                        </DialogHeader>
-                        {selectedComplaint && (
-                          <div className="space-y-4 py-4">
-                            <div className="flex items-center space-x-4">
-                              <div className="bg-primary/10 p-2 rounded-full">
-                                <UserIcon className="h-6 w-6 text-primary" />
-                              </div>
-                              <div>
-                                <h4 className="font-semibold">
-                                  {selectedComplaint.raisedBy.firstName +
-                                    " " +
-                                    selectedComplaint.raisedBy.lastName}
-                                </h4>
-                                <div className="flex items-center text-sm text-muted-foreground">
-                                  <MailIcon className="h-3 w-3 mr-1" />
-                                  {selectedComplaint.raisedBy.email}
+                      {selectedComplaint && (
+                        <DialogContent className="sm:max-w-md">
+                          <DialogHeader>
+                            <DialogTitle>Student Raised Complaint</DialogTitle>
+                            <DialogDescription>
+                              This complaint was raised by{" "}
+                              {complaint.raisedBy.firstName +
+                                " " +
+                                complaint.raisedBy.lastName}
+                              .
+                            </DialogDescription>
+                          </DialogHeader>
+                          {selectedComplaint && (
+                            <div className="space-y-4 py-4">
+                              <div className="flex items-center space-x-4">
+                                <div className="bg-primary/10 p-2 rounded-full">
+                                  <UserIcon className="h-6 w-6 text-primary" />
+                                </div>
+                                <div>
+                                  <h4 className="font-semibold">
+                                    {selectedComplaint.raisedBy.firstName +
+                                      " " +
+                                      selectedComplaint.raisedBy.lastName}
+                                  </h4>
+                                  <div className="flex items-center text-sm text-muted-foreground">
+                                    <MailIcon className="h-3 w-3 mr-1" />
+                                    {selectedComplaint.raisedBy.email}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
 
-                            <div className="flex flex-wrap gap-2">
-                              <span className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800">
-                                🗂️ Type: {selectedComplaint.type}
-                              </span>
-                              
-                              <span className="inline-flex items-center rounded-full bg-purple-100 px-3 py-1 text-sm font-medium text-purple-800">
-                                👍 Upvotes:{" "}
-                                {selectedComplaint.upvotes?.length ?? 0}
-                              </span>
-
-                              {session.role === "Student" ? (
-                                <span
-                                  className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${
-                                    selectedComplaint.status === "RESOLVED"
-                                      ? "bg-green-100 text-green-800"
-                                      : selectedComplaint.status ===
-                                        "IN_PROGRESS"
-                                      ? "bg-blue-100 text-blue-800"
-                                      : "bg-amber-100 text-amber-800"
-                                  }`}
-                                >
-                                  🚦 Status:{" "}
-                                  {selectedComplaint.status.replace("_", " ")}
+                              <div className="flex flex-wrap gap-2">
+                                <span className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800">
+                                  🗂️ Type: {selectedComplaint.type}
                                 </span>
-                              ) : (
 
-                                  <div  className="w-fit">
+                                <span className="inline-flex items-center rounded-full bg-purple-100 px-3 py-1 text-sm font-medium text-purple-800">
+                                  👍 Upvotes:{" "}
+                                  {selectedComplaint.upvotes?.length ?? 0}
+                                </span>
 
-                                <Select
-                                  defaultValue={selectedComplaint.status}
-                                  onValueChange={(value) => {
-                                    setSelectedComplaint({...selectedComplaint, status: value})
-                                  }}
-                                >
-                                  <SelectTrigger id="status">
-                                    <SelectValue
-                                      placeholder={"Select Status"}
-                                    />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="PENDING">
-                                      Pending
-                                    </SelectItem>
-                                    <SelectItem value="IN_PROGRESS">
-                                      In-progress
-                                    </SelectItem>
-                                    <SelectItem value="RESOLVED">
-                                      Resolved
-                                    </SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                </div>
-                              )}
-
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-3 text-sm border rounded-lg p-4">
-                              <div>
-                                <p className="text-muted-foreground">Title</p>
-                                <p className="font-medium">
-                                  {selectedComplaint.title}
-                                </p>
+                                {session.role === "Student" ? (
+                                  <span
+                                    className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${
+                                      selectedComplaint.status === "RESOLVED"
+                                        ? "bg-green-100 text-green-800"
+                                        : selectedComplaint.status ===
+                                          "IN_PROGRESS"
+                                        ? "bg-blue-100 text-blue-800"
+                                        : "bg-amber-100 text-amber-800"
+                                    }`}
+                                  >
+                                    🚦 Status:{" "}
+                                    {selectedComplaint.status.replace("_", " ")}
+                                  </span>
+                                ) : (
+                                  <div className="w-fit">
+                                    <Select
+                                      defaultValue={selectedComplaint.status}
+                                      onValueChange={(value) => {
+                                        setSelectedComplaint({
+                                          ...selectedComplaint,
+                                          status: value,
+                                        });
+                                      }}
+                                    >
+                                      <SelectTrigger id="status">
+                                        <SelectValue
+                                          placeholder={"Select Status"}
+                                        />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="PENDING">
+                                          Pending
+                                        </SelectItem>
+                                        <SelectItem value="IN_PROGRESS">
+                                          In-progress
+                                        </SelectItem>
+                                        <SelectItem value="RESOLVED">
+                                          Resolved
+                                        </SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                )}
                               </div>
-                              <div>
-                                <p className="text-muted-foreground">
-                                  Created At
-                                </p>
-                                <p className="font-medium">
-                                  {formatDate(selectedComplaint.createdAt)}
-                                </p>
-                              </div>
-                              <div>
-                                <p className="text-muted-foreground">
-                                  Updated At
-                                </p>
-                                <p className="font-medium">
-                                  {formatDate(selectedComplaint.updatedAt)}
-                                </p>
-                              </div>
-                              {selectedComplaint.resolvedBy && (
-                                <div className="col-span-2 ">
-                                  <p className="text-muted-foreground font-bold mb-2">
-                                    Resolved By
+
+                              <div className="grid grid-cols-2 gap-3 text-sm border rounded-lg p-4">
+                                <div>
+                                  <p className="text-muted-foreground">Title</p>
+                                  <p className="font-medium">
+                                    {selectedComplaint.title}
                                   </p>
-                                  <div className="flex items-center space-x-4">
-                                    <div className="bg-primary/10 p-2 rounded-full">
-                                      <UserIcon className="h-6 w-6 text-primary" />
-                                    </div>
-                                    <div>
-                                      <h4 className="font-semibold">
-                                        {selectedComplaint.resolvedBy
-                                          .firstName +
-                                          " " +
-                                          selectedComplaint.resolvedBy.lastName}
-                                      </h4>
-                                      <div className="flex items-center text-sm text-muted-foreground">
-                                        <MailIcon className="h-3 w-3 mr-1" />
-                                        {selectedComplaint.resolvedBy.email}
+                                </div>
+                                <div>
+                                  <p className="text-muted-foreground">
+                                    Created At
+                                  </p>
+                                  <p className="font-medium">
+                                    {formatDate(selectedComplaint.createdAt)}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-muted-foreground">
+                                    Updated At
+                                  </p>
+                                  <p className="font-medium">
+                                    {formatDate(selectedComplaint.updatedAt)}
+                                  </p>
+                                </div>
+
+                                <div className="col-span-2">
+                                  <p className="text-muted-foreground">
+                                    Resolved verifies status by student
+                                    <Input
+                                      disabled={
+                                        selectedComplaint.raisedById !==
+                                        session.id
+                                      }
+                                      type="checkbox"
+                                      className="h-5 w-5 inline-block align-middle ml-3"
+                                      checked={
+                                        selectedComplaint.isSuccessfullyResolved
+                                      }
+                                      onChange={(e) =>
+                                        setSelectedComplaint({
+                                          ...selectedComplaint,
+                                          isSuccessfullyResolved:
+                                            e.target.checked,
+                                        })
+                                      }
+                                    />
+                                  </p>
+                                </div>
+
+                                {selectedComplaint.resolvedBy && (
+                                  <div className="col-span-2 ">
+                                    <p className="text-muted-foreground font-bold mb-2">
+                                      Resolved By
+                                    </p>
+                                    <div className="flex items-center space-x-4">
+                                      <div className="bg-primary/10 p-2 rounded-full">
+                                        <UserIcon className="h-6 w-6 text-primary" />
+                                      </div>
+                                      <div>
+                                        <h4 className="font-semibold">
+                                          {selectedComplaint.resolvedBy
+                                            .firstName +
+                                            " " +
+                                            selectedComplaint.resolvedBy
+                                              .lastName}
+                                        </h4>
+                                        <div className="flex items-center text-sm text-muted-foreground">
+                                          <MailIcon className="h-3 w-3 mr-1" />
+                                          {selectedComplaint.resolvedBy.email}
+                                        </div>
                                       </div>
                                     </div>
                                   </div>
-                                </div>
-                              )}
-                            </div>
-
-                            <div className="border rounded-md p-4 bg-secondary text-sm">
-                              <p className="text-muted-foreground font-medium mb-1">
-                                Description:
-                              </p>
-                              <p className="text-foreground">
-                                {selectedComplaint.description}
-                              </p>
-                            </div>
-
-                            {session.role !== "Student" &&
-                              selectedComplaint.status !== "RESOLVED" && (
-                                <div className="space-y-2">
-                                  <Label htmlFor="reasonForAccess">
-                                    Complaint resolve message
-                                  </Label>
-                                  <Textarea
-                                    id="reasonForAccess"
-                                    value={selectedComplaint.resolvedMessage}
-                                    onChange={(e) => setSelectedComplaint({...selectedComplaint, resolvedMessage : e.target.value })}
-                                    placeholder="Briefly explain how the complaint resolved?"
-                                    rows={3}
-                                  />
-                                </div>
-                              )}
-
-                            {session.role !== "Student" && selectedComplaint.status === "PENDING" && (
-                              <div className="bg-amber-50 text-amber-800 p-3 rounded-md text-sm">
-                                <div className="font-medium flex items-center">
-                                  <ShieldIcon className="h-4 w-4 mr-1 text-amber-500" />
-                                  Action Required
-                                </div>
-                                <p className="text-amber-700 mt-1">
-                                  Please review this complaint before marking it
-                                  as resolved.
-                                </p>
-                              </div>
-                            )}
-
-                            {session.role !== "Student" && selectedComplaint.status === "IN_PROGRESS" && (
-                              <div className="bg-blue-50 text-blue-800 p-3 rounded-md text-sm">
-                                <div className="font-medium flex items-center">
-                                  <Loader2 className="h-4 w-4 mr-1 animate-spin text-blue-500" />
-                                  In Progress
-                                </div>
-                                <p className="text-blue-700 mt-1">
-                                  This complaint is currently being addressed.
-                                </p>
-                              </div>
-                            )}
-
-                            {session.role !== "Student" && selectedComplaint.status === "RESOLVED" && (
-                              <div className="bg-green-50 text-green-800 p-3 rounded-md text-sm">
-                                <div className="font-medium flex items-center">
-                                  <CheckIcon className="h-4 w-4 mr-1 text-green-500" />
-                                  Resolved
-                                </div>
-                                <p className="text-green-700 mt-1">
-                                  This complaint has been resolved.
-                                </p>
-                                {selectedComplaint.resolvedMessage && (
-                                  <p className="text-green-600 mt-2">
-                                    <span className="font-medium">
-                                      Resolution Message:
-                                    </span>{" "}
-                                    {selectedComplaint.resolvedMessage}
-                                  </p>
                                 )}
                               </div>
-                            )}
-                          </div>
-                        )}
 
-                        <DialogFooter className="sm:justify-between">
-                          {selectedComplaint.raisedById === session.id && (
-                            <>
-                              <Button
-                                onClick={() =>
-                                  selectedComplaint &&
-                                  handleDeleteComplaint(selectedComplaint.id)
-                                }
-                              >
-                                <Trash2 className="h-4 w-4 mr-1" />
-                                Delete
-                              </Button>
+                              <div className="border rounded-md p-4 bg-secondary text-sm">
+                                <p className="text-muted-foreground font-medium mb-1">
+                                  Description:
+                                </p>
+                                <p className="text-foreground">
+                                  {selectedComplaint.description}
+                                </p>
+                              </div>
 
-                              <Button
-                                variant="outline"
-                                onClick={() => setDialogOpen(false)}
-                              >
-                                Close
-                              </Button>
-                            </>
+                              {session.role !== "Student" &&
+                                selectedComplaint.status !== "RESOLVED" && (
+                                  <div className="space-y-2">
+                                    <Label htmlFor="reasonForAccess">
+                                      Complaint resolve message
+                                    </Label>
+                                    <Textarea
+                                      id="reasonForAccess"
+                                      value={selectedComplaint.resolvedMessage}
+                                      onChange={(e) =>
+                                        setSelectedComplaint({
+                                          ...selectedComplaint,
+                                          resolvedMessage: e.target.value,
+                                        })
+                                      }
+                                      placeholder="Briefly explain how the complaint resolved?"
+                                      rows={3}
+                                    />
+                                  </div>
+                                )}
+
+                              {session.role !== "Student" &&
+                                selectedComplaint.status === "PENDING" && (
+                                  <div className="bg-amber-50 text-amber-800 p-3 rounded-md text-sm">
+                                    <div className="font-medium flex items-center">
+                                      <ShieldIcon className="h-4 w-4 mr-1 text-amber-500" />
+                                      Action Required
+                                    </div>
+                                    <p className="text-amber-700 mt-1">
+                                      Please review this complaint before
+                                      marking it as resolved.
+                                    </p>
+                                  </div>
+                                )}
+
+                              {session.role !== "Student" &&
+                                selectedComplaint.status === "IN_PROGRESS" && (
+                                  <div className="bg-blue-50 text-blue-800 p-3 rounded-md text-sm">
+                                    <div className="font-medium flex items-center">
+                                      <Loader2 className="h-4 w-4 mr-1 animate-spin text-blue-500" />
+                                      In Progress
+                                    </div>
+                                    <p className="text-blue-700 mt-1">
+                                      This complaint is currently being
+                                      addressed.
+                                    </p>
+                                  </div>
+                                )}
+
+                              {session.role !== "Student" &&
+                                selectedComplaint.status === "RESOLVED" && (
+                                  <div className="bg-green-50 text-green-800 p-3 rounded-md text-sm">
+                                    <div className="font-medium flex items-center">
+                                      <CheckIcon className="h-4 w-4 mr-1 text-green-500" />
+                                      Resolved
+                                    </div>
+                                    <p className="text-green-700 mt-1">
+                                      This complaint has been resolved.
+                                    </p>
+                                    {selectedComplaint.resolvedMessage && (
+                                      <p className="text-green-600 mt-2">
+                                        <span className="font-medium">
+                                          Resolution Message:
+                                        </span>{" "}
+                                        {selectedComplaint.resolvedMessage}
+                                      </p>
+                                    )}
+                                  </div>
+                                )}
+                            </div>
                           )}
 
-                          {selectedComplaint.raisedById !== session.id &&
-                            session.role === "Student" && (
+                          <DialogFooter className="sm:justify-between">
+                            {selectedComplaint.raisedById === session.id && (
                               <>
-                                <Button
-                                  onClick={() =>
-                                    selectedComplaint &&
-                                    handleUpvote(selectedComplaint.id)
-                                  }
-                                >
-                                  <ArrowUpNarrowWide className="h-4 w-4 mr-1" />
-                                  Upvote
-                                </Button>
+                                <div className="flex items-center gap-3 flex-wrap">
+                                  <Button
+                                    onClick={() =>
+                                      selectedComplaint &&
+                                      handleDeleteComplaint(
+                                        selectedComplaint.id
+                                      )
+                                    }
+                                  >
+                                    <Trash2 className="h-4 w-4 mr-1" />
+                                    Delete
+                                  </Button>
+
+                                  <Button
+                                    onClick={() =>
+                                      selectedComplaint &&
+                                      changeVerifyStatus(selectedComplaint.id)
+                                    }
+                                  >
+                                    Update
+                                  </Button>
+                                </div>
 
                                 <Button
                                   variant="outline"
@@ -664,29 +731,50 @@ const ComplaintsList = ({ complaintsDataList }: any) => {
                               </>
                             )}
 
-                          {session.role !== "Student" && (
-                            <>
-                              <Button
-                                onClick={() =>
-                                  selectedComplaint &&
-                                  handleUpdateStatus(selectedComplaint.id)
-                                }
-                              >
-                                Update
-                              </Button>
+                            {selectedComplaint.raisedById !== session.id &&
+                              session.role === "Student" && (
+                                <>
+                                  <Button
+                                    onClick={() =>
+                                      selectedComplaint &&
+                                      handleUpvote(selectedComplaint.id)
+                                    }
+                                  >
+                                    <ArrowUpNarrowWide className="h-4 w-4 mr-1" />
+                                    Upvote
+                                  </Button>
 
-                              <Button
-                                variant="outline"
-                                onClick={() => setDialogOpen(false)}
-                              >
-                                Close
-                              </Button>
-                            </>
-                          )}
-                        </DialogFooter>
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => setDialogOpen(false)}
+                                  >
+                                    Close
+                                  </Button>
+                                </>
+                              )}
 
-                      </DialogContent>
-                       }
+                            {session.role !== "Student" && (
+                              <>
+                                <Button
+                                  onClick={() =>
+                                    selectedComplaint &&
+                                    handleUpdateStatus(selectedComplaint.id)
+                                  }
+                                >
+                                  Update
+                                </Button>
+
+                                <Button
+                                  variant="outline"
+                                  onClick={() => setDialogOpen(false)}
+                                >
+                                  Close
+                                </Button>
+                              </>
+                            )}
+                          </DialogFooter>
+                        </DialogContent>
+                      )}
                     </Dialog>
                   </TableCell>
                 </TableRow>
@@ -708,8 +796,9 @@ const ComplaintsList = ({ complaintsDataList }: any) => {
         </CardContent>
       </Card>
 
-      {session.role === "Student" && <ComplaintForm allComplaints={setComplaints}/>}
-     
+      {session.role === "Student" && (
+        <ComplaintForm allComplaints={setComplaints} />
+      )}
     </>
   );
 };

@@ -77,39 +77,72 @@ export const updateUserProfileData = async (updateData : any) => {
         updateData.courseName !== "other" ? updateData.otherCourseName = "" : null;
       }
       
-      const user =
-        role === "Student"
-          ? await prisma.user.update({
-              where : {
-                id: id
-              },
-              data: {
-                ...updateData,
-                profile:{
-                  update: {
-                    ...updateData.profile
-                  }
-                }
-              },
-              include: { profile: true } 
-            })
-            : await prisma.admin.update({
-              where : {
-                id: id
-              },
-              data: {
-                ...updateData,
-                profile:{
-                  update: {
-                    ...updateData.profile
-                  }
-                }
-              },
-              include: { profile: true } 
-            });
+      console.log(updateData)
+
+      // const user =
+      //   role === "Student"
+      //     ? await prisma.user.update({
+      //         where : {
+      //           id: id
+      //         },
+      //         data: {
+      //           ...updateData,
+      //           profile:{
+      //             update: {
+      //               ...updateData.profile
+      //             }
+      //           }
+      //         },
+      //         include: { profile: true } 
+      //       })
+      //       : await prisma.admin.update({
+      //         where : {
+      //           id: id
+      //         },
+      //         data: {
+      //           ...updateData,
+      //           profile:{
+      //             update: {
+      //               ...updateData.profile
+      //             }
+      //           }
+      //         },
+      //         include: { profile: true } 
+      //       });
   
+      const cleanedProfile = Object.fromEntries(
+        Object.entries(updateData.profile || {}).filter(([_, v]) => v != null)
+      );
+      
+
+            const user = role === "Student"
+  ? await prisma.user.update({
+      where: { id },
+      data: {
+        ...updateData,
+        profile: Object.keys(cleanedProfile).length
+          ? { update: cleanedProfile }
+          : undefined
+      },
+      include: { profile: true }
+    })
+  : await prisma.admin.update({
+      where: { id },
+      data: {
+        ...updateData,
+        profile: Object.keys(cleanedProfile).length
+          ? { update: cleanedProfile }
+          : undefined
+      },
+      include: { profile: true }
+    });
+
+
+
       if (!user) throw new CustomError("User not found", false, 404);
   
+            console.log("I m saveing user", user);
+
       const { password, ...userWithoutPassword } = user;
   
       return userWithoutPassword as StudentUser | AdminUser;

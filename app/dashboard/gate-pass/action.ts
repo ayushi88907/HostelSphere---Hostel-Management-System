@@ -28,6 +28,23 @@ export async function createOutingRequest(data: any) {
   const token = generateSecureToken();
   const expiry = new Date(Date.now() + 1000 * 60 * 60 * 24)
 
+  
+  let parentsEmail = null;
+  
+  if(session.role == "Student"){
+    const user = await prisma.user.findUnique({
+      where: { id: session.id },
+      include: {
+        profile: true
+      }
+    })
+
+    parentsEmail = user?.profile?.parentsEmail;
+  }
+  
+  if(!parentsEmail)  {
+    throw new CustomError("Please add parents email first.", false, 401);
+  }
 
   const outing = await prisma.outing.create({
     data: {
@@ -40,21 +57,25 @@ export async function createOutingRequest(data: any) {
       parentApprovalToken: token,
       tokenExpiry: expiry,
     },
-    include:{
-      user:true,
-      Admin:true,
-    }
+    include: {
+      user: {
+        include: {
+          profile: true,
+        },
+      },
+      Admin: true,
+    },
   });
 
   if (!outing || !outing.id) {
     throw new CustomError("Failed to generate outing pass", false, 401);
   }
 
-  const approveUrl = `${process.env.BASE_URL}/outing/parent-confirm?token=${token}`;
+const approveUrl = `${process.env.BASE_URL}/outing/parent-confirm?token=${token}`;
 const rejectUrl = `${process.env.BASE_URL}/outing/parent-confirm?token=${token}`;
 
 await mailSender(
-  outing.parentsEmail,
+  parentsEmail,
   `<p>Your child has requested an outing with the following details:</p>
   <ul>
     <li><b>Reason:</b> ${outing.outingPurpose}</li>

@@ -62,7 +62,9 @@ model Profile {
   contact        String?
   profilePicture String?
   //only students can have room no
-  roomNo         String? // 
+  roomNo         String? //
+  parentsEmail      String?    
+  parentsContact    String?  
   //Only student Can have hostel name
   hostelName     String?
   //hostel Care only warden gets hostel care
@@ -80,6 +82,7 @@ model Complaint {
   title           String
   description     String
   status          ComplaintStatus   @default(PENDING)
+  isSuccessfullyResolved  Boolean   @default(false)
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
   images          String[]          @default([])
@@ -164,9 +167,7 @@ model Outing {
   approverById      String?
   approvedByParents Verified  @default(Pending)
   parentApprovalToken String? @unique
-  tokenExpiry         DateTime?
-  parentsEmail      String    
-  parentsContact    String    
+  tokenExpiry         DateTime?   
 }
 
 model Attendance {

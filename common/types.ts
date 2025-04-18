@@ -80,6 +80,8 @@ export const profile = z.object({
   hostelName: z.string().optional(),
   departement: z.string().optional(),
   profilePicture: z.string().optional(),
+  parentsEmail :   z.string().optional(),
+  parentsContact :  z.string().optional()
 });
 
 export const complaint = z.object({
@@ -88,6 +90,7 @@ export const complaint = z.object({
   status: z.enum(["pending", "resolved", "inProgress"]).default("pending"),
   description: z.string().max(300),
   images: z.array(z.any()).optional(),
+  isSuccessfullyResolved : z.boolean().default(false)
   // user: z.string(), // add from session
 });
 

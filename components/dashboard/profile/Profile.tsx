@@ -222,6 +222,46 @@ const Profile = ({ user, onUpdateProfile }: data) => {
                     </div>
                   )}
 
+<div className="space-y-2">
+                    <Label htmlFor="contact">Phone</Label>
+                    <Input
+                      id="contact"
+                      type="tel"
+                      defaultValue={currentUser.profile.contact}
+                      placeholder="Enter mobile number"
+                      {...register("profile.contact")}
+                      disabled={!editAccountSetting}
+                    />
+                  </div>
+
+                  {currentUser.role === "Student" && (
+                    <div className=" w-full space-y-2">
+                      <Label htmlFor="parentsEmail">Parents Email Id</Label>
+                      <Input
+                        id="parentsEmail"
+                        type="text"
+                        disabled={!editAccountSetting}
+                        defaultValue={currentUser.profile.parentsEmail}
+                        {...register("profile.parentsEmail")}
+                        placeholder="Enter your Parents Email id"
+                      />
+                    </div>
+                  )}
+
+                  {currentUser.role === "Student" && (
+                    <div className=" w-full space-y-2">
+                      <Label htmlFor="parentsContact">Parents Contact No.</Label>
+                      <Input
+                        id="parentsContact"
+                        type="text"
+                        disabled={!editAccountSetting}
+                        defaultValue={currentUser.profile.parentsContact}
+                        {...register("profile.parentsContact")}
+                        placeholder="Enter your parents mobile number"
+                      />
+                    </div>
+                  )}
+
                   {currentUser.role !== "Student" && (
                     <div className=" w-full space-y-2">
                       <Label htmlFor="roomNo">Department</Label>
@@ -236,17 +276,6 @@ const Profile = ({ user, onUpdateProfile }: data) => {
                     </div>
                   )}
 
-                  <div className="space-y-2">
-                    <Label htmlFor="contact">Phone</Label>
-                    <Input
-                      id="contact"
-                      type="tel"
-                      defaultValue={currentUser.profile.contact}
-                      placeholder="Enter mobile number"
-                      {...register("profile.contact")}
-                      disabled={!editAccountSetting}
-                    />
-                  </div>
 
                   <div className="space-y-2 md:col-span-2 relative flex flex-col">
                     <Label htmlFor="email">Email</Label>

@@ -132,26 +132,6 @@ export default function OutingPassForm({setOutingPasses}:any) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="parentsEmail">Parents Email</Label>
-              <Input
-                id="parentsEmail"
-                type="email"
-                placeholder="Parents email id"
-                {...register("parentsEmail")}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="parentsContact">Parents Contact</Label>
-              <Input
-                id="parentsContact"
-                type="text"
-                placeholder="Parents contact nubmber"
-                {...register("parentsContact")}
-              />
-            </div>
-
-            <div className="space-y-2">
               <Label htmlFor="reason">Reason</Label>
               <Textarea
                 id="reason"
